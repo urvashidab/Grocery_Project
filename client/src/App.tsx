@@ -1,8 +1,7 @@
-import type React from "react";
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import AppLayout from "./pages/AppLayout";
-import { Home } from "lucide-react";
+import Home from "./pages/Home";
 import Deals from "./pages/Deals";
 import Products from "./pages/Products";
 import ProductPage from "./pages/ProductPage";
@@ -13,7 +12,7 @@ import OrderTracking from "./pages/OrderTracking";
 import Address from "./pages/Address";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 
-function App(): React.JSX.Element {
+function App() {
   return (
     <>
       <Routes>
