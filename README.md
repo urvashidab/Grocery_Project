@@ -1,4 +1,4 @@
-Grocery Delivery Application
+**Grocery Delivery Application**
 
 A full-stack grocery delivery application built as a production-oriented learning project. The application allows customers to browse grocery products, manage their cart, place orders, and track their order status.
 
