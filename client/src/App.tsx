@@ -11,6 +11,7 @@ import MyOrders from "./pages/MyOrders";
 import OrderTracking from "./pages/OrderTracking";
 import Address from "./pages/Address";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductPage />} />
           <Route path="search" element={<SearchResults />} />
+          <Route path="*" element={<NotFound />} />
 
           {/* now- protected routes */}
           <Route element={<ProtectedRoutes />}>
