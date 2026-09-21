@@ -32,3 +32,12 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+# AI coding agent files
+.claude/
+.cursor/
+.agents/
+.devin/
+
+# Prisma generated files
+generated/
