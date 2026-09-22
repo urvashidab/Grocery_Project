@@ -41,3 +41,6 @@ coverage/
 
 # Prisma generated files
 generated/
+
+src/generated/
+
