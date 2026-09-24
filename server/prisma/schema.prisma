@@ -21,10 +21,17 @@ model User {
   password  String
   phone     String?   @default("")
   avatar    String?   @default("")
+  role  UserRole @default(CUSTOMER)
   addresses Address[]
   orders    Order[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+
 }
 
 model Address {
