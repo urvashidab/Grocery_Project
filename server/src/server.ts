@@ -3,7 +3,7 @@ dotenv.config();
 
 import express from "express";
 import cookieParser from "cookie-parser";
-import authRoute from "../routes/authRoutes.js";
+import authRoute from "./routes/authRoutes.js";
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // landing route
 app.get("/", (req, res) => {
-  res.send("Backend is running fine");
+  res.send("Backend is running fine..");
 });
 
 // routes

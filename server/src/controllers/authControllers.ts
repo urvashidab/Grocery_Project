@@ -45,7 +45,7 @@ export const register = async (req: Request, res: Response) => {
 
     // hash password
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // create user
 
@@ -78,6 +78,7 @@ export const register = async (req: Request, res: Response) => {
       .status(201)
       .json({ message: "Email is registered successfully." });
   } catch (error) {
+    console.error("registration error:", error);
     return res.status(500).json({ message: "Error while registeration" });
   }
 };
