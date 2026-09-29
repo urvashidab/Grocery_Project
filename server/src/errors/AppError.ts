@@ -1,8 +1,8 @@
 class AppError extends Error {
-  statusCode: Number;
+  statusCode: number;
   isOperational: boolean;
 
-  constructor(message: string, statusCode: Number) {
+  constructor(message: string, statusCode: number) {
     super(message);
 
     this.statusCode = statusCode;
