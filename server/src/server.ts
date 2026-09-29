@@ -4,6 +4,7 @@ dotenv.config();
 import express from "express";
 import cookieParser from "cookie-parser";
 import authRoute from "./routes/authRoutes.js";
+import { errorHandler } from "./middlewares/errorMiddleware.js";
 
 const app = express();
 
@@ -22,6 +23,9 @@ app.get("/", (req, res) => {
 
 // routes
 app.use("/api/auth", authRoute);
+
+// error handler
+app.use(errorHandler);
 
 // server initialize
 app.listen(port, () => {

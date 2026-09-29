@@ -1,31 +1,34 @@
-import { Request, Response, CookieOptions } from "express";
+import { Request, Response, NextFunction, CookieOptions } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../config/prisma.js";
 import jwt from "jsonwebtoken";
+import AppError from "../errors/AppError.js";
 
 // set cookie
 const cookieOptions: CookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
-  httpOnly: true, // XSS protection. prevents client side JS to read cookie
-  secure: process.env.NODE_ENV === "production", // sent only over HTTP in production
+  httpOnly: true, // prevents client-side JS from reading cookie
+  secure: process.env.NODE_ENV === "production",
   sameSite: "lax",
 };
 
 // registration
-export const register = async (req: Request, res: Response) => {
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { name, email, password } = req.body;
 
     // empty fields
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "Fields are required" });
+      throw new AppError("All fields are required", 400);
     }
 
     // password length validation
     if (password.length < 8) {
-      return res.status(400).json({
-        message: "Password must be at least 8 characters",
-      });
+      throw new AppError("Password must be at least 8 characters", 400);
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -38,23 +41,19 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (existedUser) {
-      return res.status(400).json({
-        message: "This email is already registered",
-      });
+      throw new AppError("This email is already registered", 409);
     }
 
     // hash password
-
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // create user
-
     const user = await prisma.user.create({
       data: {
         name: name.trim(),
         email: normalizedEmail,
         password: hashedPassword,
-        role: "CUSTOMER", // forced
+        role: "CUSTOMER",
       },
     });
 
@@ -62,7 +61,6 @@ export const register = async (req: Request, res: Response) => {
     const token = jwt.sign(
       {
         userID: user.id,
-
         email: user.email,
         role: user.role,
       },
@@ -71,29 +69,33 @@ export const register = async (req: Request, res: Response) => {
         expiresIn: "7d",
       },
     );
+
     // send token in cookie
     res.cookie("token", token, cookieOptions);
+
     // success
-    return res
-      .status(201)
-      .json({ message: "Email is registered successfully." });
+    return res.status(201).json({
+      message: "Email is registered successfully.",
+    });
   } catch (error) {
-    console.error("registration error:", error);
-    return res.status(500).json({ message: "Error while registeration" });
+    next(error);
   }
 };
 
 // login
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { email, password } = req.body;
 
     // check if empty fields
     if (!email || !password) {
-      return res.status(400).json({
-        message: "fields can not be empty",
-      });
+      throw new AppError("Email and password are required", 400);
     }
+
     // check if email is registered or not
     const normalizedEmail = email.toLowerCase().trim();
 
@@ -104,25 +106,23 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if (!registeredUser) {
-      return res.status(401).json({ message: "Invalid Email or Password" });
+      throw new AppError("Invalid email or password", 401);
     }
 
-    // check for valid credentails
-
+    // check for valid credentials
     const matchedPassword = await bcrypt.compare(
       password,
       registeredUser.password,
     );
 
     if (!matchedPassword) {
-      return res.status(401).json({ message: "Invalid Email or Password" });
+      throw new AppError("Invalid email or password", 401);
     }
 
     // generate token
     const token = jwt.sign(
       {
         userID: registeredUser.id,
-
         email: registeredUser.email,
         role: registeredUser.role,
       },
@@ -134,27 +134,30 @@ export const login = async (req: Request, res: Response) => {
 
     // send token in cookie
     res.cookie("token", token, cookieOptions);
-    // success
 
+    // success
     return res.status(200).json({
       message: "User login successfully",
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error, something went wrong" });
+    next(error);
   }
 };
 
 // logout
-
-export const logout = async (req: Request, res: Response) => {
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    // clear cookies
-
+    // clear cookie
     res.clearCookie("token", cookieOptions);
-    res.status(200).json({
+
+    return res.status(200).json({
       message: "Logout successfully",
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error, something went wrong" });
+    next(error);
   }
 };
